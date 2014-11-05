@@ -8,11 +8,8 @@ def get_file_path():
 
 
 def file_to_list(StringOfPath):
-#    with open(StringOfPath) as File:
-#        pass
-#TODO: Copypaste the below code at the place of pass.
     ListOfLists = []
-    with open("/home/kolya/Документы/PythonNinja/DataSets/Et_H_CO_n") as File:
+    with open(StringOfPath) as File:
         for line in File:
             Line = line.split(",")
             for i in range(len(Line)):
@@ -26,7 +23,7 @@ def functions_unit_test():
     TestString = get_file_path()
     assert TestString == TestString.rstrip()
     print(TestString)
-    file_to_list(get_file_path())
+    file_to_list("/home/kolya/Документы/PythonNinja/DataSets/Et_H_CO_n")
 
 
 def main():
