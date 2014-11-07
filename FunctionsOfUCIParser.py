@@ -86,4 +86,4 @@ if __name__ == "__main__":
     main()
 
 
-#TODO urlopen
+#TODO urlopen, style&documentation
