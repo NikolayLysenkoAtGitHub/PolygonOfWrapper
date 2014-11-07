@@ -4,7 +4,7 @@
 import numpy
 
 
-MAX_VALUE = 1000
+NA_VALUE = 1000
 
 
 def get_file_path():
@@ -13,38 +13,49 @@ def get_file_path():
     return FilePath
 
 
-def file_to_2D_array(PathToFile):
+def file_to_2D_array(PathToData, PathToDescription=None, NA_Value=NA_VALUE):
 
-    def convert(Line):
+    def description_to_list(PathToDescription):
+        List = []
+        with open(PathToDescription) as File:
+            for line in File:
+                line = line.rstrip()
+                Line = line.split(",")
+                List.append(Line)
+        return List
+
+    def convert(Line, Mode):
         for i in range(len(Line)):
             try:
                 Line[i] = float(Line[i])
             except ValueError:
                 if Line[i] == "N/A":
-                    Line[i] = -MAX_VALUE
+                    Line[i] = -NA_Value
                 elif Line[i] not in Dummies[i]:
                     Dummies[i].append(Line[i])
-                    Line[i] = MAX_VALUE + len(Dummies[i])
+                    Line[i] = len(Dummies[i]) + Mode * NA_Value
                 else:
-                    for j in range(len(Dummies[i])):
-                        if Dummies[i][j] == Line[i]:
-                            Line[i] = MAX_VALUE + j + 1
-                            break
+                    Line[i] = Dummies[i].index(Line[i]) + Mode * NA_Value + 1
         return Line
 
     Features = []
-    Dummies = []
-    with open(PathToFile) as File:
-        line = File.readline()
-        line.strip()
-        Line = line.split(",")
-        for i in range(len(Line)):
-            Dummies.append([])
-        Features.append(convert(Line))
-        for line in File:
-            line.strip()
+    with open(PathToData) as Data:
+        if not PathToDescription:
+            Dummies = []
+            Mode = 1
+            line = Data.readline()
+            line = line.rstrip()
             Line = line.split(",")
-            Features.append(convert(Line))
+            for i in range(len(Line)):
+                Dummies.append([])
+            Features.append(convert(Line, Mode))
+        else:
+            Dummies = description_to_list(PathToDescription)
+            Mode = 0
+        for line in Data:
+            line = line.rstrip()
+            Line = line.split(",")
+            Features.append(convert(Line, Mode))
     return numpy.array(Features)
 
 
@@ -52,10 +63,17 @@ def functions_unit_test():
     TestString = get_file_path()
     assert TestString == TestString.rstrip()
     print(TestString)
-    x = file_to_2D_array("/home/kolya/Документы/PythonNinja/DataSets/Cars")
+    print("\n")
+    DataPath = "/home/kolya/Документы/PythonNinja/DataSets/Cars"
+    DataDescription = "/home/kolya/Документы/PythonNinja/DataSets/CarsDescr"
+    x = file_to_2D_array(DataPath, DataDescription)
     print(x)
     print(x[100][4])
-    x = file_to_2D_array("/home/kolya/Документы/PythonNinja/DataSets/Et_H_CO_n")
+    x = file_to_2D_array(DataPath, None, 10)
+    print(x)
+    print(x[100][4])
+    DataPath = "/home/kolya/Документы/PythonNinja/DataSets/Et_H_CO_n"
+    x = file_to_2D_array(DataPath)
     print(x)
     print(x[100][4])
 
@@ -66,3 +84,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+#TODO urlopen
